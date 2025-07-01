@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // Creamos nuestro "restaurante" (servidor)
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Configuramos nuestro restaurante
 app.use(cors());
