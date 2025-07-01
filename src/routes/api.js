@@ -174,7 +174,7 @@ router.post('/finalizar-clase', async (req, res) => {
     const { data, error } = await supabase
       .from('video_classes')
       .update({
-        status: 'completada',
+        status: 'completed',
         ended_at: new Date().toISOString(),
         topics_covered: temasTratados,
         new_vocabulary: vocabularioNuevo,
