@@ -1,18 +1,55 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Obtener la clave de las variables de entorno
+// Obtener la clave de las variables de entorno (SIN ERROR SI FALTA)
 const apiKey = process.env.GOOGLE_AI_API_KEY;
-if (!apiKey) {
-  throw new Error('❌ Falta la clave de Google IA en las variables de entorno');
-}
 
-// Configurar el modelo de IA
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+// Configurar el modelo solo si hay clave
+let genAI = null;
+let model = null;
+
+if (apiKey) {
+  try {
+    genAI = new GoogleGenerativeAI(apiKey);
+    model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    console.log('✅ Google AI configurado correctamente');
+  } catch (error) {
+    console.error('⚠️ Error configurando Google AI:', error.message);
+  }
+} else {
+  console.log('⚠️ Google AI no configurado - funcionará en modo degradado');
+}
 
 // Función principal que genera contenido educativo
 const generarResumenClase = async (datosClase) => {
   
+  // Verificar si tenemos IA disponible
+  if (!apiKey || !model) {
+    console.log('⚠️ Google AI no disponible, devolviendo contenido básico');
+    return {
+      resumen: "Clase completada exitosamente (modo sin IA)",
+      vocabulario_repaso: ["palabra1", "palabra2", "palabra3"],
+      ejercicios_practica: [
+        {
+          "tipo": "completar_frases",
+          "instruccion": "Completa las siguientes frases",
+          "ejercicio": "Practicar el vocabulario nuevo"
+        }
+      ],
+      ejercicios_pronunciacion: [
+        {
+          "palabra": "ejemplo",
+          "fonetica": "/ejemplo/",
+          "consejo": "Practicar la pronunciación"
+        }
+      ],
+      recomendaciones: [
+        "Continuar practicando el vocabulario",
+        "Revisar las notas de la clase"
+      ],
+      proxima_clase: "Revisar y ampliar el vocabulario de esta clase"
+    };
+  }
+
   // Crear el "prompt" - instrucciones para la IA
   const prompt = `
 Eres un profesor de idiomas experto. Basándote en esta clase:
@@ -95,7 +132,16 @@ Responde SOLO con el JSON válido, sin texto adicional.
     
   } catch (error) {
     console.error('❌ Error comunicándose con la IA:', error);
-    throw error;
+    
+    // Devolver contenido básico en caso de error
+    return {
+      resumen: "Clase completada exitosamente (error de IA)",
+      vocabulario_repaso: [],
+      ejercicios_practica: [],
+      ejercicios_pronunciacion: [],
+      recomendaciones: ["Continuar practicando"],
+      proxima_clase: "Revisar vocabulario de esta clase"
+    };
   }
 };
 
