@@ -31,7 +31,7 @@ router.post('/crear-clase', async (req, res) => {
         student_email: alumnoEmail,
         video_room_url: videoUrl,
         room_id: roomId,
-        status: 'programada',
+        status: 'scheduled',
         created_at: new Date().toISOString()
       }])
       .select();
@@ -103,7 +103,7 @@ router.post('/iniciar-clase/:roomId', async (req, res) => {
     const { data, error } = await supabase
       .from('video_classes')
       .update({
-        status: 'en_curso',
+        status: 'ongoing',
         started_at: new Date().toISOString()
       })
       .eq('room_id', roomId)
